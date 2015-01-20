@@ -1,0 +1,26 @@
+import com.datastax.spark.connector.cql.CassandraConnector
+val connector = CassandraConnector(csc.conf)
+val session = connector.openSession()
+session.execute(s"DROP TABLE IF EXISTS spark_ex2.sftmax")
+session.execute(s"CREATE TABLE IF NOT EXISTS spark_ex2.sftmax(location TEXT, year INT, month INT, day INT, tmax DOUBLE, datestring TEXT, PRIMARY KEY ((location), year, month, day)) WITH CLUSTERING ORDER BY (year DESC, month DESC, day DESC)")
+
+case class Tmax(location: String, year: Int, month: Int, day: Int, tmax: Double, datestring: String)
+val tmax_raw = sc.textFile("webhdfs://192.168.159.128:50070/user/guest/data/sftmax.csv")
+val tmax_c10 = tmax_raw.map(x=>x.split(",")).map(x => Tmax(x(0), x(1).toInt, x(2).toInt, x(3).toInt, x(4).toDouble, x(5)))
+tmax_c10.saveToCassandra("spark_ex2", "sftmax")
+
+case class Tmin(location: String, year: Int, month: Int, day: Int, tmin: Double, datestring: String)
+val tmin_raw = sc.cassandraTable("spark_ex2", "sftmin")
+val tmin_c10 = tmin_raw.map(x => Tmin(x.getString("location"), x.getInt("year"), x.getInt("month"), x.getInt("day"), x.getDouble("tmin"), x.getString("datestring")))
+val tmin_pair = tmin_c10.map(x=>(x.datestring,x))
+val tmax_pair = tmax_c10.map(x=>(x.datestring,x))
+val tmin_pair1 = tmin_pair.map(x=>(x._1, (x._2.location, x._2.year, x._2.month, x._2.day, x._2.tmin, x._2.datestring)))
+val tmax_pair1 = tmax_pair.map(x=>(x._1, (x._2.location, x._2.year, x._2.month, x._2.day, x._2.tmax, x._2.datestring)))
+case class THiLoDelta(location: String, year: Int, month: Int, day: Int, hi: Double, low: Double, delta: Double, datestring: String)
+val tdelta_join1 = tmax_pair1.join(tmin_pair1)
+val tdelta_c10 = tdelta_join1.map(x => THiLoDelta(x._2._1._1, x._2._1._2, x._2._1._3, x._2._1._4, x._2._1._5, x._2._2._5, x._2._1._5 - x._2._2._5, x._1))
+session.execute(s"DROP TABLE IF EXISTS spark_ex2.sftdelta")
+session.execute(s"CREATE TABLE IF NOT EXISTS spark_ex2.sftdelta(location TEXT, year INT, month INT, day INT, hi DOUBLE, low DOUBLE, delta DOUBLE, datestring TEXT, PRIMARY KEY ((location), year, month, day)) WITH CLUSTERING ORDER BY (year DESC, month DESC, day DESC)")
+tdelta_c10.saveToCassandra("spark_ex2", "sftdelta")
+
+
