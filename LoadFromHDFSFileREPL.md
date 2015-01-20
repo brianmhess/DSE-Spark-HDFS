@@ -24,9 +24,12 @@ Additionally, you are going to need a Hadoop environment.  A simple way to do th
 
 #Setup
 
-###1. Install DSE 4.6, and start it with Spark enabled (e.g., "dse cassandra -k").  You need to ensure that you can interact with Spark via the REPL (e.g., "dse spark").
+###1. Install DSE 4.6
 
-###2. Install the Hortonworks HDP 2.2 Sandbox.   Note the IP address when it starts up.  It will have a notice similar to this:
+Start DSE with Spark enabled (e.g., "dse cassandra -k").  You need to ensure that you can interact with Spark via the REPL (e.g., "dse spark").
+
+###2. Install the Hortonworks HDP 2.2 Sandbox.   
+You will need to note the IP address when it starts up.  It will have a notice similar to this:
 
 ```
     To initiate your Hortonworks Sandbox session, 
@@ -40,7 +43,7 @@ Additionally, you are going to need a Hadoop environment.  A simple way to do th
 You will see that a number of services have been started.  We really only need HDFS and Webhdfs.
 Make note of the IP address of this machine.  Mine is 192.168.159.128, and I will use that throughout this exercise.
   
-*Note*: Hadoop does most things by hostname, not IP address.  The hostname for the Sandbox is sandbox.hortonworks.com.  Add your Sandbox to /etc/hosts:
+**Note**: Hadoop does most things by hostname, not IP address.  The hostname for the Sandbox is sandbox.hortonworks.com.  Add your Sandbox to /etc/hosts:
     192.168.159.128  sandbox.hortonworks.com
 
 ###3. Load data into HDFS on the HDP Sandbox
@@ -50,7 +53,7 @@ dse hadoop fs -mkdir webhdfs://sandbox.hortonworks.com:50070/user/guest/data
 dse hadoop fs -copyFromLocal data/sftmax.csv webhdfs://sandbox.hortonworks.com:50070/user/guest/data/sftmax.csv
 ```
 
-###4. Load data into Cassandra on the HDP Sandbox
+###4. Load data into Cassandra
 
 ```
 cqlsh -e "CREATE KEYSPACE IF NOT EXISTS spark_ex2 WITH REPLICATION = { 'class':'SimpleStrategy', 'replication_factor':1}"
