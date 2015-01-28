@@ -150,7 +150,7 @@ case class Tmax(location: String, year: Int, month: Int, day: Int, tmax: Double,
 Next, we will read the data into an RDD:
 
 ```
-val tmax_raw = sc.textFile("webhdfs://192.168.159.128:50070/user/guest/data/sftmax.csv")
+val tmax_raw = sc.textFile("webhdfs://sandbox.hortonworks.com:50070/user/guest/data/sftmax.csv")
 ```
 
 And then transform that data so that each record of the RDD is in the Tmax type:
