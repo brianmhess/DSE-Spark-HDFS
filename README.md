@@ -19,3 +19,4 @@ We will use Webhdfs to access HDFS in the Hadoop cluster.  Webhdfs is a REST
 API for HDFS.  I avoids some of the issues related to having the same HDFS
 libraries on both the client and the server.
 
+You will need to clone this repo.

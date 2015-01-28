@@ -20,6 +20,8 @@ After this, we will also join data between HDFS and Cassandra and write the resu
 
 You need to have a local copy of DSE 4.6 installed (this example is based on a tarball install).
 
+You will also need to clone this repo.
+
 Additionally, you are going to need a Hadoop environment.  A simple way to do this (which is what this exercise is based on) is to download the Hortonworks Sandbox.  The HDP 2.2 Sandbox can be downloaded from  http://hortonworks.com/products/hortonworks-sandbox/.  I used the VMWare version.
 
 #Setup
